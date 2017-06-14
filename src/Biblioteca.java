@@ -1,148 +1,115 @@
 import java.util.Scanner;
 
 public class Biblioteca {
-	
+	private static Scanner sc;
 	public static void main(String[] args) {
 	
-		Scanner sc = new Scanner(System.in);
-		String[][] livros;
-		int quantLivros;
-		String nome, autor, status, pessoa;
+		sc = new Scanner(System.in);
+		String[][] livros; // variável principal que contem todos os livros.
+		int quantLivros, i=0;
+		String nomeLivro;
 		
 		System.out.print("Digite a quantidade de livros existentes em sua biblioteca: ");
 		quantLivros = sc.nextInt();
 		System.out.println("Próximo passo: Cadastrar seus livros\n");
-		
+		sc.nextLine();  // Consume newline left-over
 		livros = new String[quantLivros][4];
 		
-		for (int i = 0; i < livros.length; i++) {
-		
-//			if (i == 0) {
-				System.out.print("Digite o nome do livro " + (i+1) +": ");
-				nome = sc.nextLine();
-				sc.nextLine();  // Consume newline left-over
-				System.out.print("Digite o autor desse livro: ");
-				autor = sc.nextLine();
-				
-				System.out.print("Digite o status desse livro: ");
-				status = sc.nextLine();
-				
-				System.out.print("Digite o nome da pessoa que pegou esse livro: ");
-				pessoa = sc.nextLine();
-				
-				livros[i][0] = nome.toUpperCase();
-				livros[i][1] = autor.toUpperCase();
-				livros[i][2] = status.toUpperCase();
-				livros[i][3] = pessoa.toUpperCase();
-				
-				System.out.println("Livro " + (i+1) + " cadastrado!");
-				
-//			} else {
-//				String resposta;
-//				System.out.println("Quer cadastrar mais um livro? Responda SIM ou NÃO");
-//				resposta = sc.next();
-//				
-//				if (resposta.equalsIgnoreCase("SIM")) {
-//					cadastrar(livros);
-//				} else if (resposta.equalsIgnoreCase("N�O")) {
-//					int restante = livros.length - i;
-//					System.out.println("Existe(m) " + restante + " livro(s) não cadastrado(s).");
-//				} else {
-//					System.out.println("Digite uma op��o v�lida!");
-//				}
-//				
-//			}
+		// Cadastro inicial dos livros
+		while(1==1) { // loop infinito
+			String[] livro = cadastrar();
+			nomeLivro = livro[0];
 			
+			// Verifica se o livro já foi cadastrado (procurando por nome)
+			if (existePorNome(livros, nomeLivro)) {
+				System.out.println("Livro " + livro[0] + " Já cadastrado");
+				continue; // volta para o inicio do loop
+			} else {
+				livros[i] = livro;
+			}
+			
+			i++; // incremento do livro
+			if (i == quantLivros) break; // se chegou a qtd de livros, sai do loop
 		}
 		
 		int op = 0;
 		
 		do {
 			
-			op = gerarMenu();
-			
+			gerarMenu();
+			op = sc.nextInt();
 			if (op == 1) {
-				System.out.println("Cadastrar livros");
-				cadastrar(livros);
-			} else if (op == 2) {
 				System.out.println("Procurar livro");
 				procurar(livros);
-			} else if (op == 3) {
+			} else if (op == 2) {
 				System.out.println("Emprestar livro");
 				livros = emprestar(livros);
-			} else if (op == 4) {
+			} else if (op == 3) {
 				System.out.println("Devolver livro");
 				livros = devolver(livros);
-			} else if (op == 5) {
+			} else if (op == 4) {
 				System.out.println("Ver todos os livros");
 				imprimir(livros);
-			} else if (op == 6) {
-				System.out.println("Ver os relat�rios");
-				relatorios(livros);
 			} else if (op == 0) {
 				System.out.println("Saindo");
-				break;
 			} else {
-				System.out.println("Escolha uma op��o correta!");
+				System.out.println("Escolha uma opção correta!");
 			}
 			
-		} while (op == 0);
+		} while (op != 0);
 		
 	}
 	
-	public static int gerarMenu() {
-	
-		Scanner sc = new Scanner(System.in);
-		int op;
+	public static void gerarMenu() {
 		
 		System.out.println();
 		System.out.println("-----------------------------------");
-		System.out.println("1 - Cadastrar livros");
-		System.out.println("2 - Procurar livros");
-		System.out.println("3 - Emprestar livros");
-		System.out.println("4 - Devolver livros");
-		System.out.println("5 - Ver todos os livros");
-		System.out.println("6 - Ver os relat�rios");
+		System.out.println("1 - Procurar livros");
+		System.out.println("2 - Emprestar livros");
+		System.out.println("3 - Devolver livros");
+		System.out.println("4 - Ver todos os livros");
 		System.out.println("0 - Sair");
 		System.out.println("-----------------------------------");
-		System.out.print("Digite uma dessas op��es: ");
-		
-		op = sc.nextInt();
-		return op;
+		System.out.print("Digite uma dessas opções: ");
 		
 	}
 	
-	public static void cadastrar(String[][] livros) {
-		
-		Scanner sc = new Scanner(System.in);
-		String nome, autor, status, pessoa;
-		
-		for (int i = 1; i < livros.length; i++) {
+	public static boolean existePorNome(String[][] livros, String nomeLivro) {
+
+		for (int i = 0; i < livros.length; i++) {
 			
-			System.out.print("Digite o nome do " + (i+1) + "� livro: ");
-			nome = sc.next();
-			System.out.print("Digite o autor desse livro: ");
-			autor = sc.next();
-			System.out.print("Digite o status desse livro: ");
-			status = sc.next();
-			System.out.print("Digite o nome da pessoa que pegou esse livro: ");
-			pessoa = sc.next();
-			
-			livros[i][0] = nome.toUpperCase();
-			livros[i][1] = autor.toUpperCase();
-			livros[i][2] = status.toUpperCase();
-			livros[i][3] = pessoa.toUpperCase();
-			
-			int diminuir = i - 1;
-			
-			if (livros[i][0].equalsIgnoreCase(nome)) {
-				if(livros[i][0].equalsIgnoreCase(livros[diminuir][0])) {
-					System.out.println("O livro j� foi cadastrado!");
-				} else {
-					System.out.println("Livro cadastrado!");
-				}
+			if (livros[i][0] == null) {
+				return false;
+			}
+			// Veficica se o livro já esta cadastrado
+			if (livros[i][0].equals(nomeLivro.trim())) {
+				return true;
 			}
 		}
+		
+		return false;
+	}
+	
+	public static String[] cadastrar() {
+		
+		String nome, autor, status, pessoa ;
+		String[] livro = new String[4];
+			
+		System.out.print("Digite o nome do livro: ");
+		nome = sc.nextLine();
+		System.out.print("Digite o autor desse livro: ");
+		autor = sc.nextLine();
+		System.out.print("Digite o status desse livro: ");
+		status = sc.nextLine();
+		System.out.print("Digite o nome da pessoa que pegou esse livro: ");
+		pessoa = sc.nextLine();
+		
+		livro[0] = nome.trim(); // .trim() Removendo Espaço em branco no inicio e fim da String
+		livro[1] = autor.trim(); 
+		livro[2] = status.trim(); 
+		livro[3] = pessoa.trim();
+		
+		return livro;
 	}
 	
 	public static void procurar(String[][] livros) {
@@ -348,7 +315,7 @@ public class Biblioteca {
 		
 	}
 	
-	public static String[][] imprimir(String[][] livros) {
+	public static void imprimir(String[][] livros) {
 		
 		System.out.println("Nome\t\t" + "Autor\t\t" + "Status\t\t" + "Pessoa");
 		
@@ -356,10 +323,7 @@ public class Biblioteca {
 			System.out.print(livros[i][0] + "\t\t");
 			System.out.print(livros[i][1] + "\t\t" + livros[i][2] + "\t\t" + livros[i][3]);
 			System.out.println();
-		}
-		
-		return livros;
-		
+		}		
 	}
 	
 	public static void relatorios(String[][] livros) {
