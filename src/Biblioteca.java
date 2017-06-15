@@ -17,11 +17,11 @@ public class Biblioteca {
 		
 		// Cadastro inicial dos livros
 		while(1==1) { // loop infinito
-			String[] livro = cadastrar();
+			String[] livro = criarLivro();
 			nomeLivro = livro[0];
 			
 			// Verifica se o livro já foi cadastrado (procurando por nome)
-			if (existePorNome(livros, nomeLivro)) {
+			if (existePorTitulo(livros, nomeLivro) > -1) {
 				System.out.println("Livro " + livro[0] + " Já cadastrado");
 				continue; // volta para o inicio do loop
 			} else {
@@ -43,10 +43,10 @@ public class Biblioteca {
 				procurar(livros);
 			} else if (op == 2) {
 				System.out.println("Emprestar livro");
-				livros = emprestar(livros);
+				emprestar(livros);
 			} else if (op == 3) {
 				System.out.println("Devolver livro");
-				livros = devolver(livros);
+				devolver(livros);
 			} else if (op == 4) {
 				System.out.println("Ver todos os livros");
 				imprimir(livros);
@@ -74,44 +74,32 @@ public class Biblioteca {
 		
 	}
 	
-	public static boolean existePorNome(String[][] livros, String nomeLivro) {
-
-		for (int i = 0; i < livros.length; i++) {
-			
-			if (livros[i][0] == null) {
-				return false;
-			}
-			// Veficica se o livro já esta cadastrado
-			if (livros[i][0].equals(nomeLivro.trim())) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
-	public static String[] cadastrar() {
+	/*
+	 * Método para criar um livro
+	 * */
+	public static String[] criarLivro() {
 		
 		String nome, autor, status, pessoa ;
 		String[] livro = new String[4];
 			
-		System.out.print("Digite o nome do livro: ");
+		System.out.print("Digite o título do livro: ");
 		nome = sc.nextLine();
 		System.out.print("Digite o autor desse livro: ");
 		autor = sc.nextLine();
 		System.out.print("Digite o status desse livro: ");
 		status = sc.nextLine();
-		System.out.print("Digite o nome da pessoa que pegou esse livro: ");
-		pessoa = sc.nextLine();
 		
 		livro[0] = nome.trim(); // .trim() Removendo Espaço em branco no inicio e fim da String
 		livro[1] = autor.trim(); 
 		livro[2] = status.trim(); 
-		livro[3] = pessoa.trim();
+		livro[3] = "";
 		
 		return livro;
 	}
 	
+	/*
+	 * Questão 1: Emprestar Livro
+	 * */
 	public static void procurar(String[][] livros) {
 		
 		int op = 0;
@@ -122,22 +110,22 @@ public class Biblioteca {
 			op = menuProcurar();
 			
 			if (op == 1) {
-				System.out.println("\nProcurar livro por t�tulo");
+				System.out.println("\nProcurar livro por título");
 				procurarTitulo(livros);
 			} else if (op == 2) {
 				System.out.println("\nProcurar livro por autor");
-				livros = procurarAutor(livros);
+				procurarAutor(livros);
 			} else if (op == 3) {
-				System.out.println("\nExibir todos os livros dispon�veis");
-				livros = exibirDisponivel(livros);
+				System.out.println("\nExibir todos os livros disponíveis");
+				exibirDisponivel(livros);
 			} else if (op == 0) {
 				System.out.println("Saindo");
 				break;
 			} else {
-				System.out.println("Escolha uma op��o correta!");
+				System.out.println("Escolha uma opção correta!");
 			}
 			
-		} while (op == 0);
+		} while (op != 0);
 		
 	}
 	
@@ -148,12 +136,12 @@ public class Biblioteca {
 		
 		System.out.println();
 		System.out.println("-----------------------------------");
-		System.out.println("1 - Procurar livro por t�tulo");
+		System.out.println("1 - Procurar livro por título");
 		System.out.println("2 - Procurar livro por autor");
-		System.out.println("3 - Exibir todos os livros dispon�veis");
+		System.out.println("3 - Exibir todos os livros disponíveis");
 		System.out.println("0 - Sair");
 		System.out.println("-----------------------------------");
-		System.out.print("Escolha uma dessas op��es: ");
+		System.out.print("Escolha uma dessas opções: ");
 		
 		op = sc.nextInt();
 		return op;
@@ -161,253 +149,188 @@ public class Biblioteca {
 	}
 	
 	public static void procurarTitulo(String[][] livros) {
-	
-		Scanner sc = new Scanner(System.in);
+
 		String busca;
-		System.out.print("Digite o nome do livro: ");
-		busca = sc.next();
+		System.out.print("Digite o título do livro: ");
+		busca = sc.next().trim(); // removendo do texto os caracteres em branco do inicio e fim do texto 
 		System.out.println();
 		
 		for (int i = 0; i < livros.length; i++) {
 		
-			if (livros[i][0].equalsIgnoreCase(busca)) {
-				System.out.println("Nome: " + livros[i][0]);
-				System.out.println("Autor: " + livros[i][1]);
-				System.out.println("Status: " + livros[i][2]);
-				System.out.println("Pessoa: " + livros[i][3] + "\n");
+			if (livros[i][0].equals(busca)) {
+				exibirLivro(livros[i]);
 				return;
 			}
 			
 		}
 		
-		System.out.println("Livro n�o encontrado!");
+		System.out.println("Livro não encontrado!");
 		
 	}
 	
-	public static String[][] procurarAutor(String[][] livros) {
+	public static void procurarAutor(String[][] livros) {
 	
-		Scanner sc = new Scanner(System.in);
 		String busca;
+		int contador = 0;
 		System.out.print("Digite o autor do(s) livro(s): ");
-		busca = sc.next();
+		busca = sc.next().trim(); // removendo do texto os caracteres em branco do inicio e fim do texto 
 		System.out.println();
 		
 		for (int i = 0; i < livros.length; i++) {
 			
-			String autor = livros[i][1];
-			
-			if (livros[i][1].equalsIgnoreCase(busca)) {
-				if (livros[i][1].equalsIgnoreCase(autor)){
-					System.out.println("Nome: " + livros[i][0]);
-					System.out.println("Autor: " + autor);
-					System.out.println("Status: " + livros[i][2]);
-					System.out.println("Pessoa: " + livros[i][3] + "\n");
-			} else {
-				System.out.println("Livro n�o encontrado!");
-				return livros;
-			}
-			
-			}
-			
+			if (livros[i][1].equals(busca)) {
+				exibirLivro(livros[i]);
+				contador++;
+			}			
 		}
 		
-		return livros;
-		
+		if (contador == 0) {
+			System.out.println("Livro não encontrado!");
+		}
 	}
 	
-	public static String[][] exibirDisponivel(String[][] livros) {
+	public static void exibirDisponivel(String[][] livros) {
 		
 		System.out.println("Nome\t\t" + "Autor\t\t" + "Status\t\t" + "Pessoa\t\t");
 		
 		for (int i = 0; i < livros.length; i++) {
 			
 			if (livros[i][2].equalsIgnoreCase("DISPONIVEL")) {
-				System.out.print(livros[i][0] + "\t\t");
-				System.out.print(livros[i][1] + "\t\t" + livros[i][2] + "\t\t" + livros[i][3]);
-				System.out.println();
+				imprimirLivro(livros[i]);
 			}
-			
 		}
-		
-		return livros;
 		
 	}
 	
-	public static String[][] emprestar(String[][] livros) {
+	/*
+	 * Questão 2: Emprestar Livro
+	 * */
+	public static void emprestar(String[][] livros) {
 		
-		Scanner sc = new Scanner(System.in);
-		String entrada, pessoa;
+		String titulo, nome;
+		int indice;
+		sc.nextLine();  // Consume newline left-over
 		System.out.println();
-		System.out.print("Digite o nome do livro que vai ser emprestado: ");
-		entrada = sc.next();
+		System.out.print("Digite o título do livro que vai ser emprestado: ");
+		titulo = sc.nextLine();
 		System.out.print("Digite o nome da pessoa que vai pegar esse livro: ");
-		pessoa = sc.next();
-		String nome = pessoa;
+		nome = sc.nextLine();
 		
+		indice = existePorTitulo(livros, titulo);
 		
-		for (int i = 0; i < livros.length; i++) {
-
-				if (livros[i][0].equalsIgnoreCase(entrada)) {
-						
-					if (livros[i][2].equalsIgnoreCase("EMPRESTADO")) {
-						System.out.println("Livro n�o dispon�vel! Escolha outro!");
-					} else {
-						
-						if (livros[i][3].equalsIgnoreCase(pessoa)) {
-							
-							pessoa = "1";
-							int vezes = Integer.parseInt(pessoa);
-							
-							
-							if (vezes < 4) {
-								livros[i][2] = "EMPRESTADO";
-								livros[i][3] = nome;
-								System.out.println("Livro Emprestado!");
-								System.out.println("Essa pessoa pegou " + "livro(s)");
-							} else {
-								System.out.println("");
-							}
-						}
-								
-					}
-						
-					return livros;
-						
-				}
-				
-			
-			
+		if (indice == -1) {
+			System.out.println("Livro não existe!");
+			return;
 		}
 		
-		System.out.println("Livro n�o encontrado!");
-		return livros;
+		if (livros[indice][2].equalsIgnoreCase("EMPRESTADO")) {
+			System.out.println("Livro não disponível!");
+			return;
+		}
+		
+		livros[indice][2] = "emprestado";
+		livros[indice][3] = nome;
+		System.out.println("Livro " + titulo + " EMPRESTADO com sucesso!");
 		
 	}
 	
-	public static String[][] devolver(String[][] livros) {
+	/*
+	 * Questão 3: Devolver Livro
+	 * */
+	public static void devolver(String[][] livros) {
 		
-		Scanner sc = new Scanner(System.in);
-		String entrada;
+		String titulo;
+		int indice;
+		sc.nextLine();  // Consume newline left-over
 		System.out.println();
-		System.out.print("Digite o nome do livro que vai ser devolvido: ");
-		entrada = sc.next();
+		System.out.print("Digite o título do livro que vai ser emprestado: ");
+		titulo = sc.nextLine();
 		
-		for (int i = 0; i < livros.length; i++) {
+
+		indice = existePorTitulo(livros, titulo);
 		
-			if (livros[i][0].equalsIgnoreCase(entrada)) {
-				
-				if (livros[i][2].equalsIgnoreCase("DISPONIVEL")) {
-					System.out.println("Livro n�o est� emprestado!");
-				} else {
-					livros[i][2] = "DISPONIVEL";
-					livros[i][3] = " - ";
-					System.out.println("Livro devolvido!");
-				}
-				
-				return livros;
-				
-			}
-			
+		if (indice == -1) {
+			System.out.println("Livro não existe!");
+			return;
 		}
 		
-		System.out.println("Livro n�o encontrado!");
-		return livros;
+		if (livros[indice][2].equalsIgnoreCase("DISPONIVEL")) {
+			System.out.println("Livro não esta EMPRESTADO!");
+			return;
+		}
+		
+		livros[indice][2] = "disponivel";
+		livros[indice][3] = "";
+		System.out.println("Livro " + titulo + " DEVOLVIDO com sucesso!");
 		
 	}
 	
+	/*
+	 * Questão 4: Ver todos os livros
+	 * */
 	public static void imprimir(String[][] livros) {
+		int op;
 		
-		System.out.println("Nome\t\t" + "Autor\t\t" + "Status\t\t" + "Pessoa");
+		System.out.println("Título\t\t" + "Autor\t\t" + "Status\t\t" + "Pessoa\t\t");
 		
 		for (int i = 0; i < livros.length; i++) {
-			System.out.print(livros[i][0] + "\t\t");
-			System.out.print(livros[i][1] + "\t\t" + livros[i][2] + "\t\t" + livros[i][3]);
-			System.out.println();
+			
+				imprimirLivro(livros[i]);
 		}		
 	}
 	
-	public static void relatorios(String[][] livros) {
-	
-		int op = 0;
+	public static int menuImprimir () {
 		
-		do {
-		
-			op = menuRelatorio();
-			
-			if (op == 1) {
-				System.out.println("Ver todos os livros dispon�veis\n");
-				livroDisponivel(livros);
-			} else if (op == 2) {
-				System.out.println("Ver todos os livros emprestados\n");
-				livroEmprestado(livros);
-			} else if (op == 3) {
-				System.out.println("Ver a quantidade de livros n�o cadastrados\n");
-				livroNaoCadastrado(livros);
-			} else if (op == 0) {
-				System.out.println("Saindo");
-				break;
-			} else {
-				System.out.println("Escolha uma op��o correta!");
-			}
-				
-		} while (op == 0);
-		
-	}
-	
-	public static int menuRelatorio () {
-		
-		Scanner sc = new Scanner(System.in);
 		int op;
 		
 		System.out.println();
 		System.out.println("-----------------------------------");
-		System.out.println("1 - Ver todos os livros dispon�veis");
+		System.out.println("1 - Ver todos os livros disponíveis");
 		System.out.println("2 - Ver todos os livros emprestados");
-		System.out.println("3 - Ver a quantidade de livros n�o cadastrados");
 		System.out.println("0 - Sair");
 		System.out.println("-----------------------------------");
-		System.out.print("Escolha uma dessas op��es: ");
+		System.out.print("Escolha uma dessas opções: ");
 		
 		op = sc.nextInt();
 		return op;
 		
 	}
 	
-	public static String[][] livroDisponivel (String[][] livros) {
+	
+	/*
+	 * Métodos auxiliares
+	 * */
+
+	public static int existePorTitulo(String[][] livros, String titulo) {
+		int indice = -1;
+		
+		for (int i = 0; i < livros.length; i++) {
 			
-		for (int i = 0; i < livros.length; i++) {
-			if (livros[i][2].equalsIgnoreCase("DISPONIVEL")) {
-				System.out.println("Existe(m) " + livros[i][2] + " livro(s) com esse status.");	
+			if (livros[i][0] == null) {
+				continue; // volta para o início do for
 			}
-		
+			// Veficica se o livro já esta cadastrado
+			if (livros[i][0].equals(titulo.trim())) {
+				indice = i;
+				break;
+			}
 		}
-		return livros;
 		
+		return indice;
+	}
+
+	
+	public static void exibirLivro(String[] livro) {
+		
+		System.out.println("Título: " + livro[0]);
+		System.out.println("Autor: " + livro[0]);
+		System.out.println("Status: " + livro[2]);
+		System.out.println("Pessoa: " + livro[3] + "\n");
 	}
 	
-	public static String[][] livroEmprestado (String[][] livros) {
-	
-		for (int i = 0; i < livros.length; i++) {
-		
-			if (livros[i][2].equalsIgnoreCase("EMPRESTADO")) {
-				System.out.println("Existe(m) " + i + " livro(s) com esse status.");
-			}
-		
-		}
-	
-		return livros;
-		
-	}
-	
-	public static String[][] livroNaoCadastrado (String[][] livros) {
-		
-		for (int i = 0; i < livros.length; i++) {
-			int restante = livros.length - (i + 1);
-			System.out.println("Existe(m) " + restante + " livros n�o cadastrados");	
-		}
-		
-		return livros;
-		
+	public static void imprimirLivro(String[] livro) {
+				
+		System.out.print(livro[0] + "\t\t" + livro[1] + "\t\t" + livro[2] + "\t\t" + livro[3] + "\r\n"); // [Robertha]: melhorar a tabulação. Apagar comentário
 	}
 	
 }
